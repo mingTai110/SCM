@@ -1,0 +1,8 @@
+SCMFCST/
+*.pyc
+__pycache__/
+*.env
+Dataset/
+KA_MODEL.ipynb
+KA_part_no.ipynb
+origin.ipynb

@@ -1,4 +1,5 @@
 import pandas as pd
+from dateutil.relativedelta import relativedelta
 from  utils.tools import Caculate_Gap_year
 
 so_ori=pd.read_csv('Dataset\So_Data.csv')
@@ -24,3 +25,21 @@ def Openso_Preprocess(data=open_so_ori, version_year=None):
     OP_info=OP_info[['COMPANY_ID', 'year_month', 'PG', 'PD', 'MODEL','PART_NO', 'SHIP_PLANT', 'OPEN_QTY', 'ABC_INDICATOR']]
 
     return OP_info
+
+def Upload_Data(new_data,Region_class,today):
+    upload_columns=['MANDT','MATNR','WERKS','FCST_TYPE','FCST_DATE','CREATE_DATE','FCST_QTY','AIFCST_RATE','MOVING_AVG_QTY','MOVING_AVG_RATE','EVALUTE_FLAG','ALERT_FLAG','ZSTRATEGY','AI_TREND']
+    new_data['MANDT']='168'
+    new_data['FCST_TYPE']='R'
+    new_data['CREATE_DATE']=today.strftime('%Y%m%d')
+    new_data['FCST_DATE']=(today+relativedelta(months=2)).strftime('%Y%m')
+    new_data['MOVING_AVG_QTY']='0'
+    new_data['MOVING_AVG_RATE']='0'
+    new_data["EVALUTE_FLAG"]='0'
+    new_data["ALERT_FLAG"]='0'
+    new_data["FCST_QTY"]=0
+    new_data['AIFCST_RATE']=0
+    new_data['WERKS']=Region_class+"H1"
+    new_data["ZSTRATEGY"]=''
+
+    new_data= new_data[upload_columns]
+    return new_data

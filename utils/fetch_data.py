@@ -37,9 +37,9 @@ class DataExtractor:
         product_info = product_ori.groupby('PART_NO').apply(select_aiflag).reset_index(drop=True)
         return product_info
 
-    def get_openso(self, previous_month):
+    def get_openso(self, previous_month):#"ZADDON"."ZTHA_HISTSO
         sql_schema_open_so = f"""
-        SELECT * FROM "ZADDON"."ZTHA_HISTSO"
+        SELECT * FROM "ZADDON"."ZTHA_HISTSO_BY_FIRST_REQUIREDT"
         WHERE Part_No IN 
         ( 
         SELECT Distinct MATNR FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_MATERIAL_MASTER" AS MARA
@@ -48,7 +48,7 @@ class DataExtractor:
         AND ZZPLM_STAT IN ('A','H','N','V') 
         AND MTART IN ('ZFIN','ZOEM')
         OR AIFLAG = 'Y'
-        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%) AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
+        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%') AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
         OR (MATNR IN {self.extra_parts})
         )
         AND VERSION >= '{previous_month}'
@@ -56,9 +56,9 @@ class DataExtractor:
         open_so_ori = pd.read_sql(sql_schema_open_so, self.extract_connection)
         return open_so_ori
 
-    def get_openso_current(self):
+    def get_openso_current(self): ##_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_SO_BY_FIRST_REQUIREDT"
         sql_schema_open_so_c = f"""
-        SELECT * FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_SO"
+        SELECT * FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_SO_BY_FIRST_REQUIREDT"
         WHERE Part_No IN
         ( 
         SELECT Distinct MATNR FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_MATERIAL_MASTER" AS MARA
@@ -67,7 +67,7 @@ class DataExtractor:
         AND ZZPLM_STAT IN ('A','H','N','V') 
         AND MTART IN ('ZFIN','ZOEM')
         OR AIFLAG = 'Y'
-        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%) AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
+        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%') AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
         OR (MATNR IN {self.extra_parts})
         )
         """
@@ -85,15 +85,15 @@ class DataExtractor:
         AND ZZPLM_STAT IN ('A','H','N','V') 
         AND MTART IN ('ZFIN','ZOEM')
         OR AIFLAG = 'Y'
-        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%) AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
+        OR ((PRDPD IN ('Industrial Storage')) AND (HQABC LIKE 'A%' OR HQABC LIKE 'B%' OR HQABC LIKE 'C%') AND (ZZPLM_STAT IN ('A','H','N','V')) AND (MTART IN ('ZFIN','ZOEM','ZPER')))
         OR (MATNR IN {self.extra_parts})
         )
         AND VERSION >= '{previous_year}'
         """
         open_wo_ori = pd.read_sql(sql_schema_open_wo, self.extract_connection)
         return open_wo_ori
-
-    def get_openwo_current(self):
+    
+    def get_openwo_current(self): 
         sql_schema_open_wo_c = f"""
         SELECT * FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_WO"
         WHERE Part_No IN 
@@ -138,9 +138,9 @@ class DataExtractor:
         fcst_ori = pd.read_sql(sql_schema_fcst, self.extract_connection)
         return fcst_ori
 
-    def get_so_data(self, previous_year):
+    def get_so_data(self, previous_year): # 有加入FIRST_REQUIRED_DATE
         sql_schema_so = f"""
-        SELECT * FROM _SYS_BIC."APP_AIS/ZCV_APP_AIS_SO_INFO_BY_REQUIREDT"
+        SELECT * FROM _SYS_BIC."APP_AIS/ZCV_APP_AIS_SO_INFO_BY_REQUIREDT" 
         WHERE Part_No IN 
         ( 
         SELECT Distinct MATNR FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_MATERIAL_MASTER" AS MARA

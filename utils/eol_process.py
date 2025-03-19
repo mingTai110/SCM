@@ -53,9 +53,11 @@ class EOLHandler:
     def get_target_EOL_parts(self, parts_changed):
         today = pd.Timestamp.today().normalize()
         parts_changed = parts_changed[parts_changed['PART_NO_NEW'] != 'AIMB-508HF-EAA1']
-        parts_changed = parts_changed[parts_changed['ABC_INDICATOR_NEW'].str.startswith(('A', 'B'))] # add C indicator 
-        parts_changed['ZZMP_DATE_NEW'] = parts_changed['ZZMP_DATE_NEW'].replace('00000000', '99991231')
+        # add C indicator 
+        parts_changed = parts_changed[parts_changed['ABC_INDICATOR_NEW'].str.startswith(('A', 'B', 'C'))]  
+        parts_changed['ZZMP_DATE_NEW'] = parts_changed['ZZMP_DATE_NEW'].replace('00000000', '20991231')
         parts_changed['ZZMP_DATE_NEW'] = pd.to_datetime(parts_changed['ZZMP_DATE_NEW'], format='%Y%m%d')
+        # years
         parts_changed = parts_changed[parts_changed['ZZMP_DATE_NEW'] > today - relativedelta(years=2)]
         parts_changed = parts_changed[parts_changed['PD_NEW'] != 'Industrial Storage']
         return parts_changed
@@ -72,22 +74,26 @@ class EOLHandler:
         else:
             return 'many-to-many'
         
-    # 產出資料
+    # 產生EOL 對照表
     def get_eol_data(self):
         eol = self.get_eol_pair()
+        print(eol)
         product_ori = self.get_target_product(eol['PART_NO_OLD'].unique().tolist() + eol['PART_NO_NEW'].unique().tolist())
+        print(product_ori)
         df = eol.merge(product_ori, how="left", left_on="PART_NO_OLD", right_on="PART_NO")
         df1 = df.merge(product_ori, how="left", left_on="PART_NO_NEW", right_on="PART_NO")
         df1.columns = ['PART_NO_OLD', 'PART_NO_NEW', 'LASTBUY_DATE', 'PART_NO_x', 'PG_OLD', 'PD_OLD', 'PLM_STATUS_OLD', 'ABC_INDICATOR_OLD', 'ZZMP_DATE_OLD', 'PART_NO_y', 'PG_NEW', 'PD_NEW', 'PLM_STATUS_NEW', 'ABC_INDICATOR_NEW', 'ZZMP_DATE_NEW']
         df1 = df1[['PART_NO_OLD', 'PART_NO_NEW', 'LASTBUY_DATE', 'PG_OLD', 'PD_OLD', 'PLM_STATUS_OLD', 'ABC_INDICATOR_OLD', 'ZZMP_DATE_OLD', 'PG_NEW', 'PD_NEW', 'PLM_STATUS_NEW', 'ABC_INDICATOR_NEW', 'ZZMP_DATE_NEW']]
         df1 = df1.dropna()
-
+        # df1.to_csv("df1.csv")
         part_to_replace_counts = df1.groupby('PART_NO_OLD')['PART_NO_NEW'].nunique()
         replace_to_part_counts = df1.groupby('PART_NO_NEW')['PART_NO_OLD'].nunique()
 
         df1['Relationship'] = df1.apply(lambda row: self.determine_relationship(row['PART_NO_OLD'], row['PART_NO_NEW'], part_to_replace_counts, replace_to_part_counts), axis=1)
+        
+        # df1=df1.loc[df1['PART_NO_OLD'] != 'AIMC-3202-00C1']
         df1 = self.get_target_EOL_parts(df1)
-        df1 = df1[['PART_NO_OLD', 'PART_NO_NEW']].reset_index(drop=True)
+        # df1 = df1[['PART_NO_OLD', 'PART_NO_NEW']].reset_index(drop=True)
         self.eol_map_data=df1
         # return self.eol_map_data
     

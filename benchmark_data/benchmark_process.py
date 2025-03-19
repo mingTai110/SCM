@@ -11,7 +11,7 @@ class BenchmarkProcessor:
     def load_data(self, file_path):
         # Load data from the specified file path
         self.aifcst_postprocess= pd.read_csv(file_path)
-        self.aifcst_nonpostprocess=orgin_fcst_result(start_month_version=2, evaluation_months=8)
+        self.aifcst_nonpostprocess=orgin_fcst_result(start_month_version=2, evaluation_months=11)
 
     def MSU_data_preprocess(self, start_date, end_date, gap_year=2, IIOT=True):
         if self.aifcst_postprocess is None:

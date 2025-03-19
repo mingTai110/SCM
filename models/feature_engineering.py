@@ -1,6 +1,18 @@
 import pandas as pd
 import numpy as np
 
+def train_valid_split(input_data, output_data, end_date, fcst_month, fcst_days=1,train_month= 13):
+    
+    train_input=pd.DataFrame(input_data[end_date-train_month-fcst_month:end_date-fcst_month ]).iloc[:,1:].reset_index(drop=True)
+    train_output=pd.DataFrame(output_data[end_date-train_month-fcst_month:end_date-fcst_month ]).reset_index(drop=True)
+    train_output['labels']=pd.DataFrame(input_data[end_date-train_month-fcst_month:end_date-fcst_month]).iloc[:,0].reset_index(drop=True)
+
+    test_input=pd.DataFrame(input_data[end_date: end_date+fcst_days]).iloc[:,1:].reset_index(drop=True)
+    test_output=pd.DataFrame(output_data[end_date: end_date+fcst_days]).reset_index(drop=True)
+    test_output['labels']=pd.DataFrame(input_data[end_date: end_date+fcst_days]).iloc[:,0].reset_index(drop=True)
+    
+    return train_input, test_input, train_output, test_output
+
 class FeatureProcessor:
     def __init__(self):
         pass
@@ -73,14 +85,16 @@ class FeatureProcessor:
         data['Feature_44'] = data['Openso_1'].rolling(window=6).mean().shift(0).fillna(0)
         data['Feature_45'] = data['Openso_2'].rolling(window=6).mean().shift(-1).fillna(0)
         data['Feature_46'] = data['Openso_3'].rolling(window=6).mean().shift(-2).fillna(0)
+        #近三個月實際需求量 
         data['Feature_47']=data['ORDER_QTY'].shift(1).fillna(0)
         data['Feature_48']=data['ORDER_QTY'].shift(2).fillna(0)
         data['Feature_49']=data['ORDER_QTY'].shift(3).fillna(0)
-
+        # 3個月前訂單到2個月前訂單增減量
         Openso3and4_diff = PART_NO_Openso_3.OPEN_QTY - PART_NO_Openso_4.OPEN_QTY
         data['Feature_50']= Openso3and4_diff.shift(-2).fillna(0)
         data['Feature_51']= Openso3and4_diff.shift(-1).fillna(0)
         data['Feature_52']= Openso3and4_diff.shift(0).fillna(0)
+        # 4個月前訂單到3個月前訂單增減量
         Openso4and5_diff = PART_NO_Openso_4.OPEN_QTY - PART_NO_Openso_5.OPEN_QTY
         data['Feature_53']= Openso4and5_diff.shift(-3).fillna(0)
         data['Feature_54']= Openso4and5_diff.shift(-2).fillna(0)

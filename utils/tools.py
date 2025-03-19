@@ -10,6 +10,18 @@ def Caculate_Gap_year(version, YM):
     diff_month=12*year+month
     return diff_month
 
+def standard_scalar(data):
+    normalrized_data= (data-data.mean())/data.std()
+    return normalrized_data
+
+def acc_caculate(actual,fcst): #actual->series
+    error=np.abs((fcst-actual)/actual).clip(0,1).fillna(0)
+    acc=round((1-error)*100,2)
+    return acc
+
+def WACC(Acc, qty): #acc->array qty->array
+    wacc =np.sum((Acc*qty)/np.sum(qty))
+    return wacc
 
 def fiilna(data_name, full_date_range, date_name='year_month', QTY_name= 'ORDER_QTY' ):
     ''' 
@@ -53,7 +65,7 @@ def Save_Part_Data(file_path, PART_NO_SO,Trend_Indicator, PG, Region_class, PD_n
 
 
 
-def Plot_History_Trend(PART_NO_name, Model_openso, Model_openso_2, so_info, trend_labels):   
+def Plot_History_Trend(PART_NO_name, Model_openso, Model_openso_2, Model_openso_3, so_info, trend_labels):   
     '''
     這張圖是在說所有客戶同料號的情況
     '''
@@ -64,7 +76,7 @@ def Plot_History_Trend(PART_NO_name, Model_openso, Model_openso_2, so_info, tren
     '''
     plt.plot(Model_openso['year_month'], Model_openso['OPEN_QTY'], label=f' {PART_NO_name} in open_So by 1 month (shift)', marker='o',color='orange')
     plt.plot(Model_openso_2['year_month'], Model_openso_2['OPEN_QTY'], label=f'{PART_NO_name} in open_So by 2 month (shift)', marker='o',color='pink')
-    # plt.plot(Model_openso_3['YM'], Model_openso_3['OPEN_QTY'], label=f'{model_name} and {PART_NO_name} in open_So by 3 month (shift)', marker='o',color='brown')
+    plt.plot(Model_openso_3['year_month'], Model_openso_3['OPEN_QTY'], label=f'{PART_NO_name} in open_So by 3 month (shift)', marker='o',color='brown')
     # plt.plot(opendata_info['YM'], opendata_info['Trend'], label=f'{model_name} and {PART_NO_name} in open_So action at thrat month ', marker='o',color='green')
     '''
     so_data time series
@@ -91,4 +103,27 @@ def Plot_History_Trend(PART_NO_name, Model_openso, Model_openso_2, so_info, tren
     plt.xlabel('Date')
     plt.ylabel('Value')
     # plt.title(f'MODEL_{model} Comparison between so  and open_so')
+    plt.legend()
+
+
+def Plot_(data):   
+    '''
+    這張圖是在說所有客戶同料號的情況
+    '''
+    plt.figure(figsize=(10, 6))
+    plt.plot(data['Date'], data['Openso_1'], label=f' {PART_NO_name} in open_So by 1 month (shift)', marker='o',color='orange')
+    plt.plot(data['Date'], data['Openso_2'], label=f'{PART_NO_name} in open_So by 2 month (shift)', marker='o',color='pink')
+    plt.plot(data['Date'], data['Openso_2(modified)'], label=f'{PART_NO_name} in open_So by 1 month (shift openso_2)', marker='o',color='green')
+
+    # plt.plot(data['Date'], data['Openso_2(modified)_3month'], label=f'{PART_NO_name} in open_So by 1 month (shift openso_2_3month)', marker='o',color='red')
+    plt.plot(data['Date'], data['ORDER_QTY'], label=f' {PART_NO_name} in So', marker='x',color='blue')
+
+    ''' 
+    open_so 指標
+    '''
+    plt.bar(data['Date'], data['labels']*10, label='trend_labels' , alpha=0.3, width=20 ,color='black')
+
+    # 添加标签和标题
+    plt.xlabel('Date')
+    plt.ylabel('Value')
     plt.legend()

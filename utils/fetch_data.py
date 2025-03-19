@@ -37,9 +37,9 @@ class DataExtractor:
         product_info = product_ori.groupby('PART_NO').apply(select_aiflag).reset_index(drop=True)
         return product_info
 
-    def get_openso(self, previous_month):#"ZADDON"."ZTHA_HISTSO
+    def get_openso(self, previous_month):#"ZADDON"."ZTHA_HISTSO_BY_FIRST_REQUIREDT
         sql_schema_open_so = f"""
-        SELECT * FROM "ZADDON"."ZTHA_HISTSO_BY_FIRST_REQUIREDT"
+        SELECT * FROM "ZADDON"."ZTHA_HISTSO"
         WHERE Part_No IN 
         ( 
         SELECT Distinct MATNR FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_MATERIAL_MASTER" AS MARA
@@ -55,7 +55,7 @@ class DataExtractor:
         """
         open_so_ori = pd.read_sql(sql_schema_open_so, self.extract_connection)
         return open_so_ori
-
+        
     def get_openso_current(self): ##_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_SO_BY_FIRST_REQUIREDT"
         sql_schema_open_so_c = f"""
         SELECT * FROM "_SYS_BIC"."APP_AIS/ZCV_APP_AIS_OPEN_SO_BY_FIRST_REQUIREDT"

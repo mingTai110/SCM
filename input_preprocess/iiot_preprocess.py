@@ -23,7 +23,7 @@ class DataPreprocessor:
         wo_data['year_month'] = pd.to_datetime(wo_data[date_columns]).dt.to_period('M').dt.to_timestamp()
         return wo_data.rename(columns={"QTY": "ORDER_QTY"})
 
-    def so_wo_combination(self, so_data, wo_data):
+    def merge_so_wo(self, so_data, wo_data):
         # Combine SO and WO data
         so_temp = so_data[['year_month', 'PG', 'PD', 'MODEL', 'PART_NO', 'ABC_INDICATOR', 'ORDER_QTY']]
         wo_temp = wo_data[['year_month', 'PG', 'PD', 'MODEL', 'PART_NO', 'ABC_INDICATOR', 'ORDER_QTY']]
